@@ -9,12 +9,18 @@ class CommitFetcher:
     
     def get_commits(self):
         return self.required_commits_
+    
+    def get_committers(self):
+        c=self.repo.iter_commits()
+        for x in c:
+            print(x.author.name)
+        return []
 
 class LastCommitFetcher(CommitFetcher):
     def get_commits(self):        
         """ Gets the commits of the user that needs to be logged """
         commits = self.repo.iter_commits()       
-        user = self.config['source_repo']['use_value']
+        user = self.config['source_repo']['committer']
         for commit in commits:
             # Get user's commit and make sure it is not a MERGE commit
             if(commit.author.name == user and len(commit.parents) == 1):
@@ -26,7 +32,7 @@ class LastCommitFetcher(CommitFetcher):
 class CurrentDayCommitFetcher(CommitFetcher):
     def get_commits(self):
         commits = self.repo.iter_commits()       
-        user = self.config['source_repo']['use_value']
+        user = self.config['source_repo']['committer']
         for commit in commits:
             # Get user's commit and make sure it is not a MERGE commit
             if(commit.author.name == user and len(commit.parents) == 1 and commit.committed_datetime.date()==date.today()):

@@ -41,7 +41,7 @@ def update_log_file(commits):
         Returns true if operation is successful else returns false
     """
     # Open workbook and sheet
-    workbook = openpyxl.load_workbook(CONFIG['log_repo']['log_xl_file_path'])
+    workbook = openpyxl.load_workbook(CONFIG['log_repo']['local_path']+'/'+CONFIG['log_repo']['log_xl_file_relative_path'])
     sheet = workbook[CONFIG['log_repo']['xl_sheet_name']]
     last_row = None
 
@@ -67,7 +67,7 @@ def update_log_file(commits):
         sheet['F' + str(current_row)] = commit.message.strip('\n')
         sheet['G' + str(current_row)] = 'NO'
         current_row = current_row + 1
-    workbook.save(CONFIG['log_repo']['log_xl_file_path'])
+    workbook.save(CONFIG['log_repo']['local_path']+'/'+CONFIG['log_repo']['log_xl_file_relative_path'])
     return True
 
 
@@ -133,7 +133,9 @@ def log_commits_to_file(commit_fetcher):
 
 def handle_user_options(args):
     if(args.setup):
-        print('setup')
+        repo=get_source_repo()
+        config.setup_config(repo)
+        
     elif(args.today):               
         repo=get_source_repo()
         commit_fetcher=CurrentDayCommitFetcher(repo)
@@ -141,9 +143,8 @@ def handle_user_options(args):
     else:
         repo=get_source_repo()
         commit_fetcher=LastCommitFetcher(repo)
-        log_commits_to_file(commit_fetcher)
+        log_commits_to_file(commit_fetcher)      
        
-        print('latest')
 
 
 if __name__ == "__main__":
@@ -156,6 +157,10 @@ if __name__ == "__main__":
     group.add_argument('--version','-v',help='Displays the version of the script',action='version',version='1.0')
     
     args=parser.parse_args()
-    handle_user_options(args)
+    #handle_user_options(args)
+    repo=get_source_repo()
+    config.setup_config(repo)
+    
+    
     
     

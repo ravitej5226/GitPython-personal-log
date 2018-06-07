@@ -1,0 +1,13 @@
+source_repo:
+  local_path:   
+  committer: 
+
+log_repo:
+  local_path: 
+  log_xl_file_relative_path:
+  xl_sheet_name: 
+  author:    
+  autopush: n 
+
+
+  
