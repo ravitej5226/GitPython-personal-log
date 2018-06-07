@@ -12,9 +12,17 @@ class CommitFetcher:
     
     def get_committers(self):
         c=self.repo.iter_commits()
+        committers=[]        
+        index=1
         for x in c:
-            print(x.author.name)
-        return []
+            if(not x.author.name in committers):                
+                committers.append(x.author.name)        
+                index=index+1
+            
+            if(index>15):
+                break
+            
+        return committers
 
 class LastCommitFetcher(CommitFetcher):
     def get_commits(self):        

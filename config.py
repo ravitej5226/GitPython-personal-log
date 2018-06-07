@@ -14,6 +14,35 @@ def get_config_file():
 
     return config
 
+def setup_author(repo):
+    print('Setting up author...')
+    print('Getting list of authors who recently committed to the branch')
+    config =get_config_file()
+    commit_fetcher=CommitFetcher(repo)
+    committers=commit_fetcher.get_committers()
+    index=1
+    for user in committers:
+        print('{0}. {1}'.format(index,user))
+        index=index+1
+    isSet=False
+    while(not isSet):
+        user_choice=raw_input('Enter the index number of the committer from above list set')
+        user_choice=user_choice.rstrip()
+        # Validate user choice
+        # Validate integer
+        # Validate range
+        if(not (user_choice.isdigit() and int(user_choice)<index)):
+            print('Invalid input!')
+        else:
+            isSet=True
+            config['source_repo']['committer']=str(committers[int(user_choice)-1])
+    
+    with open('config.yml', 'w') as config_file:
+        yaml.dump(config,config_file,default_flow_style=False)
+    
+    print("Committer for the source repo is set to {0}".format(str(committers[int(user_choice)-1])))
+
+
 def setup_config(repo):
     print('Setting up... Please enter following information to complete setup')
     print('Press Enter key to retain the defaults')

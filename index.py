@@ -11,6 +11,7 @@ from git import Repo
 from termcolor import cprint
 from colorama import init
 from commit_fetcher import *
+from win32com.client import Dispatch
 
 CONFIG = config.get_config_file()
 
@@ -35,6 +36,15 @@ def get_log_repo():
     """ Loads and returns the log repository """
     return Repo(CONFIG['log_repo']['local_path'])
 
+def open_log_file():
+    xl = Dispatch("Excel.Application")
+    xl.Visible = True # otherwise excel is hidden
+
+    # newest excel does not accept forward slash in path
+    print(CONFIG['log_repo']['local_path']+'/'+CONFIG['log_repo']['log_xl_file_relative_path'])
+    wb = xl.Workbooks.Open(CONFIG['log_repo']['local_path']+'/'+CONFIG['log_repo']['log_xl_file_relative_path'])
+    #wb.Close()
+    #xl.Quit()
 
 def update_log_file(commits):
     """ Updates the log file with the given commit information and saves the file
@@ -117,14 +127,21 @@ def log_commits_to_file(commit_fetcher):
             cprint('There was an error updating the log file. Please contact the administrator','red')        
             quit()
 
-        # Git commit and push
-        cprint('Committing the log file...', COLORS['information'])
-       # log_repo.index.add([CONFIG['log_repo']['log_xl_file_path']])
-       # log_repo.index.commit('Updated')
-
-        cprint('Pushing the log file', COLORS['information'])
-        # log_repo.remotes[0].push()
         cprint('Updating the log file successful', COLORS['success'])
+
+        # If auto push is y, push the file
+        if(CONFIG['log_repo']['autopush']=='y'):                
+            # Git commit and push        
+            cprint('Committing the log file...', COLORS['information'])
+            #log_repo.index.add([CONFIG['log_repo']['log_xl_file_path']])
+            #log_repo.index.commit('Updated')
+
+            cprint('Pushing the log file', COLORS['information'])
+            #log_repo.remotes[0].push()
+        
+        cprint('Opening the log file...', COLORS['information'])
+        open_log_file()
+
     except Exception as e:
         cprint('ERROR:\n{0}\nExiting the program now...'.format(
             str(e)), COLORS['error'])
@@ -133,13 +150,16 @@ def log_commits_to_file(commit_fetcher):
 
 def handle_user_options(args):
     if(args.setup):
-        repo=get_source_repo()
-        config.setup_config(repo)
-        
+        #repo=get_source_repo()
+        #config.setup_config(repo)
+        print("This feature is still under development. Please update config.yml manually.")
     elif(args.today):               
         repo=get_source_repo()
         commit_fetcher=CurrentDayCommitFetcher(repo)
         log_commits_to_file(commit_fetcher)
+    elif(args.setup_author):               
+        repo=get_source_repo()
+        config.setup_author(repo)        
     else:
         repo=get_source_repo()
         commit_fetcher=LastCommitFetcher(repo)
@@ -152,14 +172,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     group=parser.add_mutually_exclusive_group()
     group.add_argument('--setup','-s',help='Sets up the script for the user by initializing all the required information',action='store_true')
+    group.add_argument('--setup-author','-a',help='Set up the author of the source repo',action='store_true')
     group.add_argument('--latest','-l',help='Logs the last commit to the log file',action='store_true',dest='latest')
     group.add_argument('--today','-t',help='Logs all the commits of today to the log file',action='store_true')    
     group.add_argument('--version','-v',help='Displays the version of the script',action='version',version='1.0')
     
     args=parser.parse_args()
-    #handle_user_options(args)
-    repo=get_source_repo()
-    config.setup_config(repo)
+    
+    handle_user_options(args)
+    #repo=get_source_repo()
+    #config.setup_config(repo)
     
     
     
