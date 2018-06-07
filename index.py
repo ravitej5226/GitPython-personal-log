@@ -40,8 +40,7 @@ def open_log_file():
     xl = Dispatch("Excel.Application")
     xl.Visible = True # otherwise excel is hidden
 
-    # newest excel does not accept forward slash in path
-    print(CONFIG['log_repo']['local_path']+'/'+CONFIG['log_repo']['log_xl_file_relative_path'])
+    # newest excel does not accept forward slash in path    
     wb = xl.Workbooks.Open(CONFIG['log_repo']['local_path']+'/'+CONFIG['log_repo']['log_xl_file_relative_path'])
     #wb.Close()
     #xl.Quit()
@@ -133,11 +132,11 @@ def log_commits_to_file(commit_fetcher):
         if(CONFIG['log_repo']['autopush']=='y'):                
             # Git commit and push        
             cprint('Committing the log file...', COLORS['information'])
-            #log_repo.index.add([CONFIG['log_repo']['log_xl_file_path']])
-            #log_repo.index.commit('Updated')
+            log_repo.index.add([CONFIG['log_repo']['log_xl_file_path']])
+            log_repo.index.commit('Updated')
 
             cprint('Pushing the log file', COLORS['information'])
-            #log_repo.remotes[0].push()
+            log_repo.remotes[0].push()
         
         cprint('Opening the log file...', COLORS['information'])
         open_log_file()
