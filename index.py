@@ -137,6 +137,8 @@ def log_commits_to_file(commit_fetcher):
 
             cprint('Pushing the log file', COLORS['information'])
             log_repo.remotes[0].push()
+        else:
+            cprint('Auto push is DISABLED.', COLORS['information'])
         
         cprint('Opening the log file...', COLORS['information'])
         open_log_file()
@@ -156,7 +158,7 @@ def handle_user_options(args):
         repo=get_source_repo()
         commit_fetcher=CurrentDayCommitFetcher(repo)
         log_commits_to_file(commit_fetcher)
-    elif(args.setup_author):               
+    elif(args.setup_committer):               
         repo=get_source_repo()
         config.setup_author(repo)        
     else:
@@ -171,7 +173,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     group=parser.add_mutually_exclusive_group()
     group.add_argument('--setup','-s',help='Sets up the script for the user by initializing all the required information',action='store_true')
-    group.add_argument('--setup-author','-a',help='Set up the author of the source repo',action='store_true')
+    group.add_argument('--setup-committer','-a',help='Set up the committer of the source repo',action='store_true')
     group.add_argument('--latest','-l',help='Logs the last commit to the log file',action='store_true',dest='latest')
     group.add_argument('--today','-t',help='Logs all the commits of today to the log file',action='store_true')    
     group.add_argument('--version','-v',help='Displays the version of the script',action='version',version='1.0')
